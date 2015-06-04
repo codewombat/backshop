@@ -1,0 +1,158 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the Backshop module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function backshop_schema() {
+  $schema = array();
+
+  $schema['backshop_store'] = array(
+    'description' => 'The base table for Backshop stores.',
+    'fields' => array(
+      'store_id' => array(
+        'description' => 'The primary identifier for a store.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      // Defaults to NULL in order to avoid a brief period of potential
+      // deadlocks on the index.
+      'revision_id' => array(
+        'description' => 'The current {backshop_store_revision}.revision_id version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
+      'type' => array(
+        'description' => 'The type of this store.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'langcode' => array(
+        'description' => 'The language code of this store.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'title' => array(
+        'description' => 'The title of this store, always treated as non-markup plain text.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid that owns this store; initially, this is the user that created it.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Boolean indicating whether the store is active or disabled.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the store was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the store was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'unique keys' => array(
+      'revision_id' => array('revision_id'),
+    ),
+    'foreign keys' => array(
+      'backshop_store_revision' => array(
+        'table' => 'backshop_store_revision',
+        'columns' => array('revision_id' => 'revision_id'),
+      ),
+      'backshop_store_owner' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+    ),
+    'primary key' => array('store_id'),
+  );
+
+  $schema['backshop_store_revision'] = array(
+    'description' => 'Stores information about each saved revision of a {backshop_store}.',
+    'fields' => array(
+      'store_id' => array(
+        'description' => 'The {backshop_store} this revision belongs to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'revision_id' => array(
+        'description' => 'The primary identifier for this revision.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid that created this revision.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'title' => array(
+        'description' => 'The title of this revision.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'log' => array(
+        'description' => 'The log entry explaining the changes in this revision.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+      ),
+      'timestamp' => array(
+        'description' => 'A Unix timestamp indicating when this revision was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Boolean indicating whether the store was active or disabled at the time of this revision.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+    ),
+    'indexes' => array(
+      'store_id' => array('store_id'),
+    ),
+    'primary key' => array('revision_id'),
+    'foreign keys' => array(
+      'versioned_store' => array(
+        'table' => 'backshop_store',
+        'columns' => array('store_id' => 'store_id'),
+      ),
+      'revision_author' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+    ),
+  );
+
+  return $schema;
+}

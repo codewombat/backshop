@@ -1,0 +1,4 @@
+name = Backshop
+description = Provides the base feature set and entities for Backshop.
+backdrop = 1.x
+package = Backshop
