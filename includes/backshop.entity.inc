@@ -138,6 +138,13 @@ class BackshopStore extends Entity {
   public function uri() {
     return NULL;
   }
+
+  /**
+   * Returns an instance of the entity's controller.
+   */
+  public function getController() {
+    return entity_get_controller($this->entityType());
+  }
 }
 
 /**
