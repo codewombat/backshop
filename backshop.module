@@ -9,12 +9,95 @@ define('BACKSHOP_ENTITY_ACTIVE', 1);
 define('BACKSHOP_ENTITY_DISABLED', 0);
 
 /**
+ * Implements hook_menu().
+ */
+function backshop_menu() {
+  $items = array();
+
+  $items['admin/backshop'] = array(
+    'title' => 'Backshop',
+    'description' => 'Manage your Backshop eCommerce data and configuration.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access backshop administration pages'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+    'weight' => -7,
+  );
+
+  $items['admin/backshop/config'] = array(
+    'title' => 'Configuration',
+    'description' => 'Manage your Backshop configuration.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access backshop administration pages'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+    'weight' => -7,
+  );
+
+  $items['admin/backshop/config/store'] = array(
+    'title' => 'Store settings',
+    'description' => 'Manage your store information and other settings.',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('backshop_store_settings_form'),
+    'access arguments' => array('configure backshop store'),
+    'file' => 'backshop.admin.inc',
+  );
+
+  $items['admin/backshop/config/store/settings'] = array(
+    'title' => 'Settings',
+    'description' => 'Manage your store information and other settings.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_admin_bar_output_alter().
+ */
+function backshop_admin_bar_output_alter(&$content) {
+  // Disable our default local task menu item from appearing in the admin bar.
+  $content['menu']['menu']['admin/backshop']['admin/backshop/config']['admin/backshop/config/store']['admin/backshop/config/store/settings']['#access'] = FALSE;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function backshop_permission() {
+  $permissions = array(
+    'access backshop administration pages' => array(
+      'title' => t('Access Backshop administration pages'),
+      'description' => t('Allows users to access various Backshop administration pages.'),
+      'restrict access' => TRUE,
+    ),
+    'configure backshop store' => array(
+      'title' => t('Configure Backshop store'),
+      'restrict access' => TRUE,
+    ),
+  );
+
+  return $permissions;
+}
+
+/**
  * Implements hook_autoload_info().
  */
 function backshop_autoload_info() {
   return array(
     'BackshopStore' => 'includes/backshop.entity.inc',
     'BackshopVersionedEntityStorageController' => 'includes/backshop.entity.inc',
+  );
+}
+
+/**
+ * Implements hook_config_info().
+ */
+function backshop_config_info() {
+  return array(
+    'backshop.settings' => array(
+      'label' => t('Backshop settings'),
+      'group' => t('Backshop'),
+    ),
   );
 }
 
@@ -46,8 +129,8 @@ function backshop_entity_info() {
       'online' => array(
         'label' => t('Online store'),
         'admin' => array(
-          'path' => 'admin/store/configuration/store-type',
-          'access arguments' => array('administer backshop_store entities'),
+          'path' => 'admin/backshop/config/store',
+          'access arguments' => array('configure backshop store'),
         ),
       ),
     ),
