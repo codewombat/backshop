@@ -199,22 +199,6 @@ function backshop_store_load($store_id) {
 }
 
 /**
- * Returns a single loaded Backshop entity.
- *
- * @param string $entity_type
- *   The type of the entity to load.
- * @param int $id
- *   Unique ID of the entity to load.
- *
- * @return EntityInterface|bool
- *   The fully loaded entity or FALSE if not found.
- */
-function backshop_entity_load_single($entity_type, $id) {
-  $result = entity_load($entity_type, array($id));
-  return reset($result);
-}
-
-/**
  * Finds the last time an entity was changed.
  *
  * @todo Move this code to the entity controller since it's storage dependent.
