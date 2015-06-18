@@ -93,6 +93,12 @@ class BackshopStore extends Entity {
   public $revision_uid;
 
   /**
+   * During the build content routine, this variable contains the renderable
+   * array that represents the content of this entity.
+   */
+  public $content;
+
+  /**
    * Create a new Node instance.
    */
   function __construct(array $values = array()) {
@@ -140,10 +146,74 @@ class BackshopStore extends Entity {
   }
 
   /**
-   * Returns an instance of the entity's controller.
+   * Determines whether or not the current store can be deleted.
+   *
+   * Any store that is referenced by another entity cannot be deleted. They
+   * should be disabled instead.
    */
-  public function getController() {
-    return entity_get_controller($this->entityType());
+  public function canDelete() {
+    return FALSE;
+  }
+
+  /**
+   * Builds a structured array representing the entity's content.
+   *
+   * @param string $view_mode
+   *   (optional) The view mode to build the array for, e.g. 'full', 'teaser',
+   *   'summary', etc. Defaults to 'full'.
+   * @param string $langcode
+   *   (optional) A language code to use for generating the content. Defaults to
+   *   the global content language of the current request.
+   * @param array $default_content
+   *   (optional) The default array to start building the content from.
+   *
+   * @return array
+   *   The renderable array.
+   */
+  public function buildContent($view_mode = 'full', $langcode = NULL, $default_content = array()) {
+    // Remove previously built content, if exists.
+    $this->content = $default_content;
+
+    // Default to the global language if necessary.
+    if (!isset($langcode)) {
+      $langcode = $GLOBALS['language_content']->langcode;
+    }
+
+    // Allow modules to change the view mode.
+    $view_mode = key(entity_view_mode_prepare($this->entityType(), array($this->id() => $this), $view_mode, $langcode));
+
+    // Build field content arrays. In the case of a multiple view, the entity
+    // controller's view method already ran the 'prepare_view' step. An internal
+    // flag prevents the operation from running twice.
+    $entity_info = entity_get_info($this->entityType());
+
+    // Prepare the field and entity data for viewing.
+    if (!empty($entity_info['fieldable'])) {
+      field_attach_prepare_view($this->entityType(), array($this->id() => $this), $view_mode, $langcode);
+    }
+
+    entity_prepare_view($this->entityType(), array($this->id() => $this), $langcode);
+
+    // Add field content to the array if the entity is fieldable.
+    if (!empty($entity_info['fieldable'])) {
+      $this->content += field_attach_view($this->entityType(), $this, $view_mode, $langcode);
+    }
+
+    // Invoke hook_ENTITY_TYPE_view() to allow modules to add their additions.
+    module_invoke_all($this->entityType() . '_view', $this, $view_mode, $langcode);
+
+    // Invoke the more generic hook_entity_view() to allow the same.
+    module_invoke_all('entity_view', $this, $this->entityType(), $view_mode, $langcode);
+
+    // Make sure the current view mode is stored if no module has already
+    // populated the related key.
+    $this->content += array('#view_mode' => $view_mode);
+
+    // Remove the build array information from the entity and return it.
+    $build = $this->content;
+    unset($this->content);
+
+    return $build;
   }
 }
 
@@ -337,6 +407,69 @@ class BackshopVersionedEntityStorageController extends EntityDatabaseStorageCont
       $entity->old_revision_id = $entity->{$this->revisionKey};
       $entity->{$this->revisionKey} = NULL;
     }
+  }
+
+  /**
+   * Generate an array for rendering the given entities.
+   *
+   * @todo Add support for a page parameter as in the Drupal 7 Entity API.
+   *
+   * @param array $entities
+   *   An array of entities implementing EntityInterface to render.
+   * @param string $view_mode
+   *   (optional) The view mode to build the array for, e.g. 'full', 'teaser',
+   *   'summary', etc. Defaults to the first view mode found in the entity info.
+   * @param string $langcode
+   *   (optional) A language code to use for generating the content. Defaults to
+   *   the global content language of the current request.
+   *
+   * @return array
+   *   The renderable array.
+   */
+  public function view($entities, $view_mode = '', $langcode = NULL) {
+    // Create a new entities array keyed by entity ID.
+    $rekeyed_entities = array();
+
+    foreach ($entities as $key => $entity) {
+      $rekeyed_entities[$entity->id()] = $entity;
+    }
+
+    $entities = $rekeyed_entities;
+
+    // If a valid view mode is not specified, use the first one available.
+    if (!isset($this->entityInfo['view modes'][$view_mode])) {
+      reset($this->entityInfo['view modes']);
+      $view_mode = key($this->entityInfo['view modes']);
+    }
+
+    if (!empty($this->entityInfo['fieldable'])) {
+      field_attach_prepare_view($this->entityType, $entities, $view_mode);
+    }
+
+    entity_prepare_view($this->entityType, $entities);
+    $langcode = isset($langcode) ? $langcode : $GLOBALS['language_content']->language;
+    $view = array();
+
+    // Build the content array for each entity passed in.
+    foreach ($entities as $key => $entity) {
+      $build = $entity->buildContent($view_mode, $langcode);
+
+      // Add default properties to the array to ensure the content is passed
+      // through the theme layer.
+      $build += array(
+        '#theme' => 'entity',
+        '#entity_type' => $this->entityType,
+        '#entity' => $entity,
+        '#view_mode' => $view_mode,
+        '#language' => $langcode,
+      );
+
+      // Allow modules to modify the build array.
+      backdrop_alter(array($this->entityType . '_view', 'entity_view'), $build, $this->entityType);
+      $view[$this->entityType][$key] = $build;
+    }
+
+    return $view;
   }
 }
 
