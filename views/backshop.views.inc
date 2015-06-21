@@ -12,20 +12,20 @@
  */
 function backshop_views_data() {
   // Define the base group of the backshop_store table. Fields that don't have
-  // have a group defined will go into this field by default.
+  // a group defined will go into this field by default.
   $data['backshop_store']['table']['group'] = t('Backshop Store');
+  $data['backshop_store']['table']['entity type'] = 'backshop_store';
 
   // Advertise this table as a possible base table
   $data['backshop_store']['table']['base'] = array(
     'field' => 'store_id',
-    'title' => t('Backshop Store'),
+    'title' => t('Backshop Stores'),
     'weight' => -10,
     'access query tag' => 'backshop_store_access',
     'defaults' => array(
       'field' => 'title',
     ),
   );
-  $data['backshop_store']['table']['entity type'] = 'backshop_store';
 
   $data['backshop_store']['table']['default_relationship'] = array(
     'backshop_store_revision' => array(
@@ -155,7 +155,7 @@ function backshop_views_data() {
     'help' => t('The user who owns the store. If you need more fields than the uid add the Store: Owner relationship'),
     'relationship' => array(
       'title' => t('Owner'),
-      'help' => t('Relate content to the user who owns it.'),
+      'help' => t('Relate the store to the user who owns it.'),
       'handler' => 'views_handler_relationship',
       'base' => 'users',
       'field' => 'uid',
@@ -226,6 +226,151 @@ function backshop_views_data() {
     ),
   );
    */
+
+  // Define the base group of the backshop_store_revision table. Fields that
+  // don't have a group defined will go into this field by default.
+  $data['backshop_store_revision']['table']['group']  = t('Backshop Store revision');
+  $data['backshop_store_revision']['table']['entity type'] = 'backshop_store';
+
+  // Advertise this table as a possible base table.
+  $data['backshop_store_revision']['table']['base'] = array(
+    'field' => 'revision_id',
+    'title' => t('Backshop Store revisions'),
+    'help' => t('Store revision is a history of changes to stores.'),
+    'defaults' => array(
+      'field' => 'title',
+    ),
+  );
+
+  // For other base tables, explain how we join.
+  $data['backshop_store_revision']['table']['join'] = array(
+    // Directly links to the backshop_store table.
+    'backshop_store' => array(
+      'left_field' => 'revision_id',
+      'field' => 'revision_id',
+    ),
+  );
+
+  $data['backshop_store_revision']['table']['default_relationship'] = array(
+    'backshop_store' => array(
+      'table' => 'backshop_store',
+      'field' => 'store_id',
+    ),
+  );
+
+  // Define the uid field for store revisions.
+  $data['backshop_store_revision']['uid'] = array(
+    'title' => t('Creator'),
+    'help' => t('Relate a store revision to the user who created the revision.'),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'users',
+      'base field' => 'uid',
+      'label' => t('revision user'),
+    ),
+  );
+
+  // Define the store ID field for store revisions.
+  $data['backshop_store_revision']['store_id'] = array(
+    'title' => t('Store ID'),
+    'help' => t('The store ID of the store revision.'),
+    'field' => array(
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_backshop_store_id',
+      'click sortable' => TRUE,
+      'numeric' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'backshop_store',
+      'base field' => 'store_id',
+      'title' => t('Store'),
+      'label' => t('Get the actual store from a store revision.'),
+    ),
+  );
+
+  // Define the revision ID field for store revisions.
+  $data['backshop_store_revision']['revision_id'] = array(
+    'title' => t('Revision ID'),
+    'help' => t('The revision ID of the store revision.'),
+    'field' => array(
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_backshop_store_revision_id',
+      'click sortable' => TRUE,
+      'numeric' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'relationship' => array(
+      'handler' => 'views_handler_relationship',
+      'base' => 'backshop_store',
+      'base field' => 'revision_id',
+      'title' => t('Store'),
+      'label' => t('Get the actual store from a store revision.'),
+    ),
+  );
+
+  // Define the store revision title field.
+  $data['backshop_store_revision']['title'] = array(
+    'title' => t('Title'),
+    'help' => t('The store revision title.'),
+    'field' => array(
+      'field' => 'title',
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+
+  // Define the store revision log field.
+  $data['backshop_store_revision']['log'] = array(
+    'title' => t('Log message'),
+    'help' => t('The log message entered when the revision was created.'),
+    'field' => array(
+      'handler' => 'views_handler_field_xss',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+  );
+
+  // Define the store revision changed timestamp field.
+  $data['backshop_store_revision']['timestamp'] = array(
+    'title' => t('Creation date'),
+    'help' => t('The date the revision was created.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+  );
 
   return $data;
 }

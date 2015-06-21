@@ -123,6 +123,7 @@ function backshop_autoload_info() {
 
     // Views handlers
     'views_handler_argument_backshop_store_id' => 'views/views_handler_argument_backshop_store_id.inc',
+    'views_handler_argument_backshop_store_revision_id' => 'views/views_handler_argument_backshop_store_revision_id.inc',
     'views_handler_argument_backshop_store_type' => 'views/views_handler_argument_backshop_store_type.inc',
     'views_handler_field_backshop_store' => 'views/views_handler_field_backshop_store.inc',
     'views_handler_field_backshop_store_link' => 'views/views_handler_field_backshop_store_link.inc',
@@ -204,6 +205,10 @@ function backshop_entity_info() {
 
   return $info;
 }
+
+/**
+ * @todo Implement hook_path_info() once tokens exist for Backshop entities.
+ */
 
 /**
  * Loads a single store.
