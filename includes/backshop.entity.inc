@@ -132,6 +132,13 @@ class BackshopStore extends Entity {
   }
 
   /**
+   * Returns the label of the entity's bundle.
+   */
+  public function bundleLabel() {
+    return backshop_entity_bundle_label($this->entityType(), $this->bundle());
+  }
+
+  /**
    * Implements EntityInterface::label().
    */
   public function label() {
