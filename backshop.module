@@ -56,31 +56,31 @@ function backshop_menu() {
     'access arguments' => array('configure backshop store'),
     'type' => MENU_LOCAL_ACTION,
     'context' => MENU_CONTEXT_PAGE,
-    'file' => 'backshop.admin.inc',
+    'file' => 'backshop.pages.inc',
   );
 
-  $items['admin/backshop/config/store/%backshop_store'] = array(
+  $items['store/%backshop_store'] = array(
     'title callback' => 'entity_label',
-    'title arguments' => array('backshop_store', 4),
+    'title arguments' => array('backshop_store', 1),
     'page callback' => 'backshop_store_view',
-    'page arguments' => array(4),
+    'page arguments' => array(1),
     'access arguments' => array('configure backshop store'),
-    'file' => 'backshop.admin.inc',
+    'file' => 'backshop.pages.inc',
   );
-  $items['admin/backshop/config/store/%backshop_store/view'] = array(
+  $items['store/%backshop_store/view'] = array(
     'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 0,
   );
-  $items['admin/backshop/config/store/%backshop_store/edit'] = array(
+  $items['store/%backshop_store/edit'] = array(
     'title' => 'Edit',
     'description' => 'Create a new store object to manage multiple store contexts.',
     'page callback' => 'backdrop_get_form',
-    'page arguments' => array('backshop_store_form', 4),
+    'page arguments' => array('backshop_store_form', 1),
     'access arguments' => array('configure backshop store'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
-    'file' => 'backshop.admin.inc',
+    'file' => 'backshop.pages.inc',
   );
 
   return $items;
