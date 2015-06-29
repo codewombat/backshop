@@ -57,7 +57,6 @@ function backshop_store_form($form, &$form_state, BackshopStore $store = NULL) {
         '#type' => 'submit',
         '#value' => t('Delete'),
         '#weight' => 10,
-        '#suffix' => l(t('Cancel'), 'store/' . $store->store_id),
       );
     }
     else {
@@ -65,13 +64,32 @@ function backshop_store_form($form, &$form_state, BackshopStore $store = NULL) {
         '#type' => 'submit',
         '#value' => t('Disable'),
         '#weight' => 10,
-        '#suffix' => l(t('Cancel'), 'store/' . $store->store_id),
       );
     }
   }
-  else {
-    $form['actions']['submit']['#suffix'] = l(t('Cancel'), 'admin/backshop/config/store');
+
+  // Prepare the cancel link options.
+  if (isset($_GET['destination'])) {
+    $path = urldecode($_GET['destination']);
   }
+  elseif (isset($_SERVER['HTTP_REFERER'])) {
+    $path = urldecode($_SERVER['HTTP_REFERER']);
+  }
+  elseif (isset($store->store_id)) {
+    $path = 'store/' . $store->store_id;
+  }
+  else {
+    $path = 'admin/backshop/config/store';
+  }
+  $options = backdrop_parse_url($path);
+
+  $form['actions']['cancel'] = array(
+    '#type' => 'link',
+    '#title' => t('Cancel'),
+    '#href' => $options['path'],
+    '#options' => $options,
+    '#weight' => 20,
+  );
 
   return $form;
 }
