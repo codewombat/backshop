@@ -40,8 +40,8 @@ class views_handler_field_backshop_store_link extends views_handler_field_entity
   function render_link($store, $values) {
     if (backshop_store_access('view', $store)) {
       $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = "admin/backshop/config/store/$store->store_id";
-      $text = !empty($this->options['text']) ? $this->options['text'] : t('view');
+      $this->options['alter']['path'] = "store/$store->store_id";
+      $text = !empty($this->options['text']) ? $this->options['text'] : t('View');
       return $text;
     }
   }

@@ -22,7 +22,7 @@ class views_handler_field_backshop_store_link_delete extends views_handler_field
     }
 
     $this->options['alter']['make_link'] = TRUE;
-    $this->options['alter']['path'] = "admin/backshop/config/store/$store->store_id/delete";
+    $this->options['alter']['path'] = "store/$store->store_id/delete";
     $this->options['alter']['query'] = backdrop_get_destination();
 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('Delete');
