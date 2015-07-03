@@ -150,3 +150,33 @@ function backshop_store_form_submit($form, &$form_state) {
 
   $form_state['redirect'] = 'store/' . $store->id();
 }
+
+/**
+ * Form callback: builds the store delete form.
+ */
+function backshop_store_delete_form($form, &$form_state, $store) {
+  $form_state['store'] = $store;
+
+  return confirm_form($form,
+    t('Are you sure you want to delete %title?', array('%title' => $store->label())),
+    'store/' . $store->id(),
+    t('This action cannot be undone.'),
+    t('Delete'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Form callback: submits the store delete form.
+ */
+function backshop_store_delete_form_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    $store = backshop_store_load($form_state['store']->id());
+    entity_delete_multiple('backshop_store', array($store->id()));
+
+    watchdog('backshop', '@type: deleted %title.', array('@type' => $store->bundleLabel(), '%title' => $store->label()));
+    backdrop_set_message(t('@type %title has been deleted.', array('@type' => $store->bundleLabel(), '%title' => $store->label())));
+  }
+
+  $form_state['redirect'] = '<front>';
+}

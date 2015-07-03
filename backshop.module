@@ -74,12 +74,23 @@ function backshop_menu() {
   );
   $items['store/%backshop_store/edit'] = array(
     'title' => 'Edit',
-    'description' => 'Create a new store object to manage multiple store contexts.',
+    'description' => 'Edit a store.',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('backshop_store_form', 1),
     'access arguments' => array('configure backshop store'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
+    'file' => 'backshop.pages.inc',
+  );
+  $items['store/%backshop_store/delete'] = array(
+    'title' => 'Delete',
+    'description' => 'Delete a store.',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('backshop_store_delete_form', 1),
+    'access arguments' => array('configure backshop store'),
+    'type' => MENU_LOCAL_ACTION,
+    'context' => MENU_CONTEXT_INLINE,
+    'weight' => 20,
     'file' => 'backshop.pages.inc',
   );
 
@@ -231,6 +242,23 @@ function backshop_store_access() {
 }
 
 /**
+ * Generates an array for rendering a single store.
+ *
+ * @param BackshopStore $store
+ *   The store object being viewed.
+ * @param string $view_mode
+ *   The view mode to render the store for.
+ * @param string $langcode
+ *   The language code to use when preparing the store for display.
+ *
+ * @return array
+ *   A render array for the store.
+ */
+function backshop_store_view(BackshopStore $store, $view_mode = 'full', $langcode = NULL) {
+  return entity_get_controller('backshop_store')->view(array($store), $view_mode, $langcode);
+}
+
+/**
  * Returns the label for a specific entity type's bundle.
  *
  * @param string $entity_type
@@ -299,21 +327,4 @@ function backshop_entity_last_changed($entity_type, $entity_id) {
   }
 
   return FALSE;
-}
-
-/**
- * Generates an array for rendering a single store.
- *
- * @param BackshopStore $store
- *   The store object being viewed.
- * @param string $view_mode
- *   The view mode to render the store for.
- * @param string $langcode
- *   The language code to use when preparing the store for display.
- *
- * @return array
- *   A render array for the store.
- */
-function backshop_store_view(BackshopStore $store, $view_mode = 'full', $langcode = NULL) {
-  return entity_get_controller('backshop_store')->view(array($store), $view_mode, $langcode);
 }

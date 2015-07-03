@@ -159,7 +159,7 @@ class BackshopStore extends Entity {
    * should be disabled instead.
    */
   public function canDelete() {
-    return FALSE;
+    return TRUE;
   }
 
   /**
@@ -454,7 +454,7 @@ class BackshopVersionedEntityStorageController extends EntityDatabaseStorageCont
     }
 
     entity_prepare_view($this->entityType, $entities);
-    $langcode = isset($langcode) ? $langcode : $GLOBALS['language_content']->language;
+    $langcode = isset($langcode) ? $langcode : $GLOBALS['language']->langcode;
     $view = array();
 
     // Build the content array for each entity passed in.
@@ -463,8 +463,9 @@ class BackshopVersionedEntityStorageController extends EntityDatabaseStorageCont
 
       // Add default properties to the array to ensure the content is passed
       // through the theme layer.
+      // @todo Add a theme template for rendered entities.
       $build += array(
-        '#theme' => 'entity',
+        // '#theme' => 'entity',
         '#entity_type' => $this->entityType,
         '#entity' => $entity,
         '#view_mode' => $view_mode,
