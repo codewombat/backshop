@@ -21,7 +21,7 @@ function backshop_views_data() {
     'field' => 'store_id',
     'title' => t('Backshop Stores'),
     'weight' => -10,
-    'access query tag' => 'backshop_store_access',
+    'access query tag' => 'backshop_entity_access',
     'defaults' => array(
       'field' => 'title',
     ),

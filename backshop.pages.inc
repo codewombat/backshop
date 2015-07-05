@@ -20,7 +20,11 @@ function backshop_store_form($form, &$form_state, BackshopStore $store = NULL) {
   // state.
   if (!isset($form_state['store'])) {
     if ($store === NULL) {
-      $store = new BackshopStore(array('type' => 'online', 'uid' => $user->uid));
+      $store = new BackshopStore(array(
+        'type' => 'online',
+        'uid' => $user->uid,
+        'status' => TRUE,
+      ));
     }
     $form_state['store'] = $store;
   }
@@ -37,6 +41,21 @@ function backshop_store_form($form, &$form_state, BackshopStore $store = NULL) {
 
   field_attach_form('backshop_store', $store, $form, $form_state, $store->langcode);
 
+  $form['status'] = array(
+    '#type' => 'radios',
+    '#title' => t('Status'),
+    '#description' => t('Disabled stores cannot be viewed or purchased from.'),
+    '#options' => array(
+      '1' => t('Active'),
+      '0' => t('Disabled'),
+    ),
+    '#default_value' => $store->status,
+    '#required' => TRUE,
+    '#weight' => 35,
+  );
+
+  dpm($store);
+
   $form['actions'] = array(
     '#type' => 'actions',
     '#weight' => 50,
@@ -50,19 +69,21 @@ function backshop_store_form($form, &$form_state, BackshopStore $store = NULL) {
   // Add a delete button if the store has an ID and can be deleted; otherwise
   // include a simple button for disabling the store.
   // @todo Add an #access parameter to these buttons based on delete access.
-  // @todo Implement the delete and disable button submit handlers.
   if (!empty($store->store_id)) {
     if ($store->canDelete()) {
       $form['actions']['delete'] = array(
         '#type' => 'submit',
         '#value' => t('Delete'),
+        '#limit_validation_errors' => array(),
+        '#submit' => array('backshop_store_form_submit_delete'),
         '#weight' => 10,
       );
     }
     else {
       $form['actions']['disable'] = array(
         '#type' => 'submit',
-        '#value' => t('Disable'),
+        '#value' => t('Cannot delete (disable instead)'),
+        '#disabled' => TRUE,
         '#weight' => 10,
       );
     }
@@ -149,6 +170,13 @@ function backshop_store_form_submit($form, &$form_state) {
   }
 
   $form_state['redirect'] = 'store/' . $store->id();
+}
+
+/**
+ * Form callback: submits the store delete button.
+ */
+function backshop_store_form_submit_delete($form, &$form_state) {
+  $form_state['redirect'] = 'store/' . $form_state['store']->id() . '/delete';
 }
 
 /**

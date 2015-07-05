@@ -17,7 +17,7 @@ class views_handler_field_backshop_store_link_delete extends views_handler_field
    */
   function render_link($store, $values) {
     // Ensure user has access to delete this store.
-    if (!backshop_store_access('delete', $store)) {
+    if (!backshop_entity_access('delete', $store)) {
       return;
     }
 

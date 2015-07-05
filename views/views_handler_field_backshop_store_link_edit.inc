@@ -17,7 +17,7 @@ class views_handler_field_backshop_store_link_edit extends views_handler_field_b
    */
   function render_link($store, $values) {
     // Ensure the user has access to edit this store.
-    if (!backshop_store_access('update', $store)) {
+    if (!backshop_entity_access('update', $store)) {
       return;
     }
 

@@ -235,9 +235,9 @@ function backshop_store_load($store_id) {
 }
 
 /**
- * Provides blanket access to stores.
+ * Provides blanket access to Backshop entities.
  */
-function backshop_store_access() {
+function backshop_entity_access() {
   return TRUE;
 }
 
