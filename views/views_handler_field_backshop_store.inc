@@ -58,7 +58,7 @@ class views_handler_field_backshop_store extends views_handler_field {
     if (!empty($this->options['link_to_store']) && !empty($this->additional_fields['store_id'])) {
       if ($data !== NULL && $data !== '') {
         $this->options['alter']['make_link'] = TRUE;
-        $this->options['alter']['path'] = "admin/backshop/config/store/" . $this->get_value($values, 'store_id');
+        $this->options['alter']['path'] = 'store/' . $this->get_value($values, 'store_id');
         if (isset($this->aliases['langcode'])) {
           $languages = language_list();
           $language = $this->get_value($values, 'langcode');

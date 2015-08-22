@@ -59,6 +59,14 @@ function backshop_menu() {
     'file' => 'backshop.pages.inc',
   );
 
+  $items['admin/backshop/config/store/%backshop_store/make-default'] = array(
+    'title' => 'Are you sure you want to change the default store?',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('backshop_store_make_default_form', 4),
+    'access arguments' => array('configure backshop store'),
+    'file' => 'backshop.admin.inc',
+  );
+
   $items['store/%backshop_store'] = array(
     'title callback' => 'entity_label',
     'title arguments' => array('backshop_store', 1),
@@ -234,6 +242,7 @@ function backshop_autoload_info() {
     'views_handler_argument_backshop_store_revision_id' => 'views/views_handler_argument_backshop_store_revision_id.inc',
     'views_handler_argument_backshop_store_type' => 'views/views_handler_argument_backshop_store_type.inc',
     'views_handler_field_backshop_store' => 'views/views_handler_field_backshop_store.inc',
+    'views_handler_field_backshop_store_is_default' => 'views/views_handler_field_backshop_store_is_default.inc',
     'views_handler_field_backshop_store_link' => 'views/views_handler_field_backshop_store_link.inc',
     'views_handler_field_backshop_store_link_delete' => 'views/views_handler_field_backshop_store_link_delete.inc',
     'views_handler_field_backshop_store_link_edit' => 'views/views_handler_field_backshop_store_link_edit.inc',
