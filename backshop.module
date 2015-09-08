@@ -248,6 +248,7 @@ function backshop_autoload_info() {
     'views_handler_field_backshop_store_link_edit' => 'views/views_handler_field_backshop_store_link_edit.inc',
     'views_handler_field_backshop_store_type' => 'views/views_handler_field_backshop_store_type.inc',
     'views_handler_filter_backshop_store_type' => 'views/views_handler_filter_backshop_store_type.inc',
+    'views_handler_sort_backshop_store_is_default' => 'views/views_handler_sort_backshop_store_is_default.inc',
   );
 }
 

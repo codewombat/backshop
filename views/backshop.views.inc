@@ -216,10 +216,15 @@ function backshop_views_data() {
   );
 
   $data['views_entity_backshop_store']['is_default'] = array(
+    'title' => t('Default store'),
+    'help' => t('Sort the default store to the top of the query results.'),
     'field' => array(
       'title' => t('Default store'),
       'help' => t('Indicates if the store is the default store for the site and offers a link to make it so if not.'),
       'handler' => 'views_handler_field_backshop_store_is_default',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_backshop_store_is_default',
     ),
   );
 
