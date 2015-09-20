@@ -394,6 +394,7 @@ function backshop_entity_access($op, $entity, $account = NULL) {
         return (bool) $query
           ->addTag($entity_info['access arguments']['access tag'])
           ->addMetaData('account', $account)
+          ->addMetaData('entity', $entity)
           ->condition($entity_info['entity keys']['id'], $entity->id())
           ->range(0, 1)
           ->execute()
@@ -595,6 +596,7 @@ function backshop_entity_access_query_alter($query, $entity_type, $base_table = 
 
   $context = array(
     'account' => $account,
+    'entity' => $query->getMetaData('entity'),
     'entity_type' => $entity_type,
     'base_table' => $base_table
   );
